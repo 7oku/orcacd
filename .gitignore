@@ -25,4 +25,4 @@ go.work
 .data
 
 # config(.yml*)
-config.*
+config.yml
