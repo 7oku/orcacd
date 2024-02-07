@@ -5,6 +5,7 @@
 OrcaCD is a small tool to bring GitOps CD to docker-compose.yml files, similar to ArgoCD/FluxCD for kubernetes.
 
 ## Installation
+
 Copy docker-compose.yml somewhere on your server
 
 ```yml
@@ -29,15 +30,25 @@ services:
     restart: unless-stopped
 ```
 
+Fire up:
+
+```bash
+$ docker compose up -d
+```
+
 ## Configuration
+
 ### - via config.yml
+
 1. add volume to *docker-compose.yml*
+
    ```yml
    volumes:
          - ./config.yml:/config.yml
    ```
 
 2. create/copy config.yml
+
     ```yml
     repos:
       githubsuperservice:
@@ -50,8 +61,8 @@ services:
    workdir: "/tmp/ocd"
    ```
 
-
 ### - via environment variables in docker-compose.yml prefixed with `OCD_`
+
 | ENV VAR | default* / possible values | Description |
 |---|---|---|
 | OCD_REPOS_EXAMPLE1_URL *(required)* | (`string`) nil* | URL to compose file |
