@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  orcacd: 
+    build:
+      context: .
+    image: ghcr.io/7oku/orcacd:develop
+    tty: true
+    ports: 
+      - "6688:6666"
+    environment:
+      # color fixes for logging
+      CI: true
+      TERM: xterm-256color
+      COLORTERM: truecolor
+      # example repo
+      OCD_REPOS_EXAMPLE_URL: "https://raw.githubusercontent.com/7oku/sample-compose/main/compose-files/servicename/docker-compose.yaml"
+      OCD_REPOS_EXAMPLE_USER: "7oku"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
