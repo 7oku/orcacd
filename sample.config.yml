@@ -2,7 +2,8 @@ repos:
   githubsuperservice:
       url: "https://raw.githubusercontent.com/7oku/sample-compose/main/compose-files/servicename/docker-compose.yaml"
 basicauth:
-  user1: "god"
+  ocdadmin: "ocd1337god"
+interval: 300
 loglevel: "error"
 autosync: "on"
 targetpath: "/tmp/opt/compose"

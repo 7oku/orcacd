@@ -26,7 +26,6 @@ type OrcaConfigRepo struct {
 	Url         string `koanf:"url"`
 	User        string `koanf:"user"`
 	Secret      string `koanf:"secret"`
-	Searchpath  string `koanf:"searchpath"`
 }
 
 func NewConfig() *OrcaConfig {
@@ -37,11 +36,11 @@ func NewConfig() *OrcaConfig {
 	k.Load(confmap.Provider(map[string]interface{}{
 		"loglevel":   "info",
 		"autosync":   "on",
-		"interval":   5,
+		"interval":   300,
 		"workdir":    "/tmp/ocd",
 		"targetpath": "/tmp/ocd/opt/compose",
 		"basicauth": map[string]string{
-			"admin": "orcacd",
+			"ocdadmin": "ocd1337god",
 		},
 	}, "."), nil)
 

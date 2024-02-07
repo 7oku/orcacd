@@ -33,10 +33,9 @@ func initialize(c *OrcaConfig) ([]*OrcaStack, api.Service) {
 	var stack *OrcaStack
 	for name, repo := range c.Repos {
 		r := OrcaConfigRepo{
-			User:       repo["user"],
-			Secret:     repo["secret"],
-			Url:        repo["url"],
-			Searchpath: repo["searchpath"],
+			User:   repo["user"],
+			Secret: repo["secret"],
+			Url:    repo["url"],
 		}
 
 		stack = NewOrcaStack(name, &r, c)

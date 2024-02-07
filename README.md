@@ -30,10 +30,11 @@ services:
     restart: unless-stopped
 ```
 
-Fire up:
+Fire up and check for logs:
 
-```bash
-$ docker compose up -d
+```console
+foo@bar:~$ docker compose up -d
+foo@bar:~$ docker compose logs -fn200
 ```
 
 ## Configuration
@@ -70,7 +71,7 @@ $ docker compose up -d
 | OCD_REPOS_EXAMPLE1_SECRET *(optional)* | (`string`) nil* | Either password or a Token (if used with github/gitlab) |
 | OCD_LOGLEVEL *(optional)* | (`string`) debug,info,warning,error* | Log level for output |
 | OCD_AUTOSYNC *(optional)* | (`string`) on*,off | Enable or disable autosync on startup |
-| OCD_INTERVAL *(optional)* | (`int`) 5* | Enable or disable autosync on startup |
+| OCD_INTERVAL *(optional)* | (`int`) 300* | Interval to check for new file in seconds |
 | OCD_WORKDIR *(optional)* | (`string`) /tmp/ocd* | Where ocd stores temp files |
 | OCD_TARGETPATH *(optional)* | (`string`) /tmp/ocd/opt/compose* | Path to place resulting services |
-| OCD_BASICAUTH_USER1 *(optional)* | (`string`) god* | BasicAuth for API (WIP) |
+| OCD_BASICAUTH_OCDADMIN *(optional)* | (`string`) ocd1337god* | BasicAuth for API (WIP) |
