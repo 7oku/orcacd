@@ -57,10 +57,12 @@ func NewOrcaStack(name string, r *OrcaConfigRepo, c *OrcaConfig) *OrcaStack {
 	return o
 }
 
+// gets the stack id
 func (orcastack *OrcaStack) GetId() string {
 	return orcastack.Id
 }
 
+// updates the docker compose project in our stack object
 func (orcastack *OrcaStack) updateDockerProject(c *OrcaConfig) error {
 	project, err := generateDockerProject(orcastack, c)
 	if err != nil {
@@ -71,6 +73,7 @@ func (orcastack *OrcaStack) updateDockerProject(c *OrcaConfig) error {
 	return nil
 }
 
+// compose up
 func (orcastack *OrcaStack) ComposeUp(svc api.Service) error {
 	err := svc.Up(*orcastack.Ctx, orcastack.Dockerprj, api.UpOptions{
 		Create: api.CreateOptions{
@@ -83,6 +86,7 @@ func (orcastack *OrcaStack) ComposeUp(svc api.Service) error {
 	return nil
 }
 
+// runs a puller instance for the stack
 func (s *OrcaStack) RunPuller(dsession api.Service, c *OrcaConfig, wg *sync.WaitGroup) {
 	logPuller.Infof("Puller started for %v [ID: %v]", s.Repoconfig.Url, s.Id)
 
@@ -99,6 +103,7 @@ func (s *OrcaStack) RunPuller(dsession api.Service, c *OrcaConfig, wg *sync.Wait
 	defer wg.Done()
 }
 
+// main cycle pulling, updating and ensuring service up
 func (s *OrcaStack) Cycle(dsession api.Service, c *OrcaConfig) (string, error) {
 	var status string
 
@@ -110,8 +115,8 @@ func (s *OrcaStack) Cycle(dsession api.Service, c *OrcaConfig) (string, error) {
 		return status, nil
 	}
 
-	logCompose.Debug("Cycle step 'update_project'")
 	// update compose in object
+	logCompose.Debug("Cycle step 'update_project'")
 	err = s.updateDockerProject(c)
 	if err != nil {
 		status = "❌ COMPOSE ERROR (SYNTAX?)"
@@ -119,8 +124,8 @@ func (s *OrcaStack) Cycle(dsession api.Service, c *OrcaConfig) (string, error) {
 		return status, nil
 	}
 
-	logCompose.Debug("Cycle step 'compose up'")
 	// compose up
+	logCompose.Debug("Cycle step 'compose up'")
 	if c.Autosync == "on" {
 		err = s.ComposeUp(dsession)
 		if err != nil {

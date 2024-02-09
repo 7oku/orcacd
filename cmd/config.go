@@ -12,6 +12,7 @@ import (
 )
 
 type OrcaConfig struct {
+	Cfileerror string
 	Targetpath string                       `koanf:"targetpath"`
 	Workdir    string                       `koanf:"workdir"`
 	Loglevel   string                       `koanf:"loglevel"`
@@ -46,7 +47,7 @@ func NewConfig() *OrcaConfig {
 
 	// load yml
 	if err := k.Load(file.Provider("config.yml"), yaml.Parser()); err != nil {
-		log.Printf("Could not load or fine a config file. Using defaults and ENV: %v", err)
+		c.Cfileerror = err.Error()
 	}
 
 	// load env
@@ -55,7 +56,7 @@ func NewConfig() *OrcaConfig {
 			strings.TrimPrefix(s, "OCD_")), "_", ".", -1)
 	}), nil)
 
-	// generate
+	// generate final config
 	err := k.Unmarshal("", &c)
 	if err != nil {
 		log.Fatalf("Cannot unmarshal configuration. Valid YAML?")

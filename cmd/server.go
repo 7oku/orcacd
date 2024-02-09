@@ -21,6 +21,11 @@ func NewServer(config *OrcaConfig) *Server {
 
 func NewRouter(config *OrcaConfig) *gin.Engine {
 	gin.ForceConsoleColor()
+	if config.Loglevel == "debug" {
+		gin.SetMode("debug")
+	} else {
+		gin.SetMode("release")
+	}
 
 	router := gin.New()
 

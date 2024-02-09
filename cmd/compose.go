@@ -12,6 +12,7 @@ import (
 	"github.com/docker/compose/v2/pkg/compose"
 )
 
+// generate docker project
 func generateDockerProject(s *OrcaStack, c *OrcaConfig) (*types.Project, error) {
 	configDetails := types.ConfigDetails{
 		WorkingDir: c.Targetpath + "/" + s.Servicename,
@@ -38,6 +39,7 @@ func generateDockerProject(s *OrcaStack, c *OrcaConfig) (*types.Project, error) 
 	return p, nil
 }
 
+// new docker session
 func createDockerSession() (api.Service, error) {
 	var srv api.Service
 	dockerCli, err := command.NewDockerCli()
@@ -57,6 +59,7 @@ func createDockerSession() (api.Service, error) {
 	return srv, nil
 }
 
+// adds some labels to the service
 func addServiceLabels(project *types.Project) {
 	for i, s := range project.Services {
 		s.CustomLabels = map[string]string{

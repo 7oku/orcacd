@@ -38,27 +38,18 @@ func (m MaskedWriter) Write(p []byte) (int, error) {
 	return m.writer.Write([]byte(stringToLog + "\n"))
 }
 
-var logOrcacd = log.NewWithOptions(os.Stderr, log.Options{
-	ReportCaller:    true,
-	Prefix:          lipgloss.NewStyle().Foreground(lipgloss.Color("#333333")).Render("orcacd"),
-	ReportTimestamp: true,
-	Level:           LogLevelFromString(config.Loglevel),
-})
+// new logger
+func NewLogger(name string, color string, level string) *log.Logger {
+	var logger = log.NewWithOptions(os.Stderr, log.Options{
+		ReportCaller:    true,
+		Prefix:          lipgloss.NewStyle().Foreground(lipgloss.Color(color)).Render(name),
+		ReportTimestamp: true,
+		Level:           LogLevelFromString(level),
+	})
+	return logger
+}
 
-var logCompose = log.NewWithOptions(os.Stderr, log.Options{
-	ReportCaller:    true,
-	Prefix:          lipgloss.NewStyle().Foreground(lipgloss.Color("#ff0000")).Render("compose"),
-	ReportTimestamp: true,
-	Level:           LogLevelFromString(config.Loglevel),
-})
-
-var logPuller = log.NewWithOptions(os.Stderr, log.Options{
-	ReportCaller:    true,
-	Prefix:          lipgloss.NewStyle().Foreground(lipgloss.Color("#0f00ff")).Render("puller"),
-	ReportTimestamp: true,
-	Level:           LogLevelFromString(config.Loglevel),
-})
-
+// extract loglevel
 func LogLevelFromString(loglevel string) log.Level {
 	loglevel = strings.ToLower(loglevel)
 
@@ -75,3 +66,8 @@ func LogLevelFromString(loglevel string) log.Level {
 		return log.DebugLevel
 	}
 }
+
+// instanciate loggers
+var logOrcacd = NewLogger("orcacd", config.Loglevel, "#333333")
+var logPuller = NewLogger("puller", config.Loglevel, "#0f00ff")
+var logCompose = NewLogger("compose", config.Loglevel, "#ff0000")

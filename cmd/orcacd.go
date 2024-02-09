@@ -9,7 +9,7 @@ func main() {
 
 	stacks, dsession := initialize(config)
 	if len(stacks) == 0 {
-		logOrcacd.Fatalf("No Stacks to work on. Did you define a repo in config?")
+		logOrcacd.Fatalf("No Stacks to work on. Did you define a repo?")
 	}
 
 	var wg sync.WaitGroup

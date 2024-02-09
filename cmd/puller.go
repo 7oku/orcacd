@@ -24,6 +24,7 @@ func NewPuller(orcastack *OrcaStack, config *OrcaConfig) *Puller {
 	}
 }
 
+// pull
 func (p *Puller) Pull() (bool, error) {
 	logPuller.Debugf("Pulling %v from %v", p.stack.Servicename, p.stack.Repoconfig.Url)
 	// get file into temporary working dir
@@ -101,8 +102,8 @@ func (p *Puller) Pull() (bool, error) {
 	return false, nil
 }
 
+// write contets into object
 func (p *Puller) PopulateCompose(sourcefile string) error {
-	// write contets into object
 	compose, err := os.ReadFile(sourcefile)
 	if err != nil {
 		return err
@@ -112,8 +113,8 @@ func (p *Puller) PopulateCompose(sourcefile string) error {
 	return nil
 }
 
+// write contents to targetfile
 func (p *Puller) Copy(sourcefile string, targetfile string) error {
-	// write contents to targetfile
 	destination, err := os.Create(targetfile)
 	if err != nil {
 		return err
@@ -128,24 +129,25 @@ func (p *Puller) Copy(sourcefile string, targetfile string) error {
 	return nil
 }
 
+// get file from remote
 func (p *Puller) Get() error {
 	dstFilename := path.Base(p.stack.Repoconfig.Url)
 
-	// Create storepath
+	// create storepath
 	err := os.MkdirAll(p.stack.Storepath, os.ModePerm)
 	if err != nil {
 		logPuller.Debug(err)
 		return err
 	}
 
-	// Create the request
+	// create the request
 	req, err := http.NewRequest("GET", p.stack.Repoconfig.Url, nil)
 	if err != nil {
 		logPuller.Debug(err)
 		return err
 	}
 
-	// Add headers for GitLab and GitHub
+	// add headers for GitLab and GitHub
 	switch true {
 	case strings.Contains(p.stack.Repoconfig.Url, "/api/v4/projects/"):
 		logPuller.Infof("%v seems to be a Gitlab URL! Applying PRIVATE-TOKEN header ... ", p.stack.Servicename)
@@ -176,7 +178,7 @@ func (p *Puller) Get() error {
 		}
 	}
 
-	// Get the response
+	// get the response
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		logPuller.Debug(err)
@@ -184,12 +186,12 @@ func (p *Puller) Get() error {
 	}
 	defer resp.Body.Close()
 
-	// Check the status code
+	// check the status code
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("bad status: %s", resp.Status)
 	}
 
-	// Create the file
+	// create the file
 	out, err := os.Create(p.stack.Storepath + "/" + dstFilename)
 	if err != nil {
 		logPuller.Debug(err)
@@ -197,7 +199,7 @@ func (p *Puller) Get() error {
 	}
 	defer out.Close()
 
-	// Write the body to file
+	// write the body to file
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
 		logPuller.Debug(err)

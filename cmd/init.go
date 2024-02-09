@@ -8,6 +8,10 @@ import (
 )
 
 func initialize(c *OrcaConfig) ([]*OrcaStack, api.Service) {
+	if c.Cfileerror != "" {
+		logOrcacd.Debugf("Config file could not be loaded: %v. Proceeding loading ENV vars only.", c.Cfileerror)
+	}
+
 	// clean old working dir
 	os.RemoveAll(c.Workdir)
 
