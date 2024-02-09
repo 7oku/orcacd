@@ -35,7 +35,7 @@ func NewConfig() *OrcaConfig {
 
 	// load defaults
 	k.Load(confmap.Provider(map[string]interface{}{
-		"loglevel":   "info",
+		"loglevel":   "error",
 		"autosync":   "on",
 		"interval":   300,
 		"workdir":    "/tmp/ocd",

@@ -4,7 +4,7 @@ services:
   orcacd: 
     build:
       context: .
-    image: ghcr.io/7oku/orcacd:develop
+    image: ghcr.io/7oku/orcacd
     tty: true
     ports: 
       - "6688:6666"
@@ -16,6 +16,7 @@ services:
       # example repo
       OCD_REPOS_EXAMPLE_URL: "https://raw.githubusercontent.com/7oku/sample-compose/main/compose-files/servicename/docker-compose.yaml"
       OCD_REPOS_EXAMPLE_USER: "7oku"
+      OCD_LOGLEVEL: "error"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped

@@ -68,6 +68,6 @@ func LogLevelFromString(loglevel string) log.Level {
 }
 
 // instanciate loggers
-var logOrcacd = NewLogger("orcacd", config.Loglevel, "#333333")
-var logPuller = NewLogger("puller", config.Loglevel, "#0f00ff")
-var logCompose = NewLogger("compose", config.Loglevel, "#ff0000")
+var logOrcacd = NewLogger("orcacd", "#333333", config.Loglevel)
+var logPuller = NewLogger("puller", "#0f00ff", config.Loglevel)
+var logCompose = NewLogger("compose", "#ff0000", config.Loglevel)

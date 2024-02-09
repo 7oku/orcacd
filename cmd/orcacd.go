@@ -1,6 +1,8 @@
 package main
 
-import "sync"
+import (
+	"sync"
+)
 
 var config = NewConfig()
 
@@ -8,6 +10,7 @@ func main() {
 	printBanner()
 
 	stacks, dsession := initialize(config)
+
 	if len(stacks) == 0 {
 		logOrcacd.Fatalf("No Stacks to work on. Did you define a repo?")
 	}
