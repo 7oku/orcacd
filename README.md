@@ -1,6 +1,7 @@
-# orcacd
+![OrcaCD](img/orcacd_logo.svg)
 
-![OrcaCD](https://github.com/7oku/orcacd/blob/main/img/orcacd_logo_300.png?raw=true)
+[![Github release](https://img.shields.io/github/v/release/7oku/orcacd.svg)](https://github.com/7oku/orcacd/releases)
+[![License](https://img.shields.io/github/license/7oku/orcacd.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 OrcaCD is a small tool to bring GitOps CD to docker-compose.yml files, similar to ArgoCD/FluxCD for kubernetes.
 
