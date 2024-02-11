@@ -1,4 +1,4 @@
-![OrcaCD](img/orcacd_logo.svg)
+![OrcaCD](img/orcacd_logo_text.svg)
 
 [![Github release](https://img.shields.io/github/v/release/7oku/orcacd.svg)](https://github.com/7oku/orcacd/releases)
 [![License](https://img.shields.io/github/license/7oku/orcacd.svg)](http://www.apache.org/licenses/LICENSE-2.0)
