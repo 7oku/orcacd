@@ -1,8 +1,6 @@
-version: "3"
-
 services:
    myalpine:
     container_name: alpine
     image: alpine
     tty: true
-
+    
