@@ -24,5 +24,9 @@ go.work
 .env
 .data
 
+#
+.air/*
+.air
+
 # config(.yml*)
 config.yml

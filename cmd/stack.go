@@ -15,16 +15,17 @@ import (
 )
 
 type OrcaStack struct {
-	Servicename string
-	Repoconfig  *OrcaConfigRepo
-	Puller      *Puller
+	servicename string
+	repoconfig  *OrcaConfigRepo
+	puller      *Puller
 
-	Id        string
-	Storepath string
+	id        string
+	storepath string
 
-	Compose   *[]byte
-	Dockerprj *types.Project
-	Ctx       *context.Context
+	compose   *[]byte
+	dockerprj *types.Project
+	ctx       *context.Context
+	status    string
 }
 
 func NewOrcaStack(name string, r *OrcaConfigRepo, c *OrcaConfig) *OrcaStack {
@@ -41,25 +42,26 @@ func NewOrcaStack(name string, r *OrcaConfigRepo, c *OrcaConfig) *OrcaStack {
 	// storepath
 	storepath := c.Workdir + "/" + id
 	o := &OrcaStack{
-		Servicename: name,
-		Repoconfig:  r,
-		Puller:      nil,
-		Compose:     &initial,
-		Ctx:         &ctx,
-		Id:          id,
-		Dockerprj:   &types.Project{},
-		Storepath:   storepath,
+		servicename: name,
+		repoconfig:  r,
+		puller:      nil,
+		compose:     &initial,
+		ctx:         &ctx,
+		id:          id,
+		dockerprj:   &types.Project{},
+		storepath:   storepath,
+		status:      "🕒 INIT",
 	}
 
 	p := NewPuller(o, c)
-	o.Puller = p
+	o.puller = p
 
 	return o
 }
 
 // gets the stack id
 func (orcastack *OrcaStack) GetId() string {
-	return orcastack.Id
+	return orcastack.id
 }
 
 // updates the docker compose project in our stack object
@@ -68,14 +70,14 @@ func (orcastack *OrcaStack) updateDockerProject(c *OrcaConfig) error {
 	if err != nil {
 		return err
 	}
-	orcastack.Dockerprj = project
+	orcastack.dockerprj = project
 
 	return nil
 }
 
 // compose up
 func (orcastack *OrcaStack) ComposeUp(svc api.Service) error {
-	err := svc.Up(*orcastack.Ctx, orcastack.Dockerprj, api.UpOptions{
+	err := svc.Up(*orcastack.ctx, orcastack.dockerprj, api.UpOptions{
 		Create: api.CreateOptions{
 			RemoveOrphans: true,
 		},
@@ -88,7 +90,7 @@ func (orcastack *OrcaStack) ComposeUp(svc api.Service) error {
 
 // runs a puller instance for the stack
 func (s *OrcaStack) RunPuller(dsession api.Service, c *OrcaConfig, wg *sync.WaitGroup) {
-	logPuller.Infof("Puller started for %v [ID: %v]", s.Repoconfig.Url, s.Id)
+	logPuller.Infof("Puller started for %v [ID: %v]", s.repoconfig.Url, s.id)
 
 	for {
 		status, err := s.Cycle(dsession, c)
@@ -96,7 +98,7 @@ func (s *OrcaStack) RunPuller(dsession api.Service, c *OrcaConfig, wg *sync.Wait
 			logPuller.Errorf("Exiting because of: %v", err)
 			break
 		}
-		logOrcacd.Printf("===[ SERVICE: %v | REPO: %v | STATUS:%v ]===", s.Servicename, el.Centering(s.Repoconfig.Url, 50), status)
+		logOrcacd.Printf("===[ SERVICE: %v | REPO: %v | STATUS:%v ]===", s.servicename, el.Centering(s.repoconfig.Url, 50), status)
 		time.Sleep(time.Duration(c.Interval) * time.Second)
 	}
 
@@ -105,23 +107,21 @@ func (s *OrcaStack) RunPuller(dsession api.Service, c *OrcaConfig, wg *sync.Wait
 
 // main cycle pulling, updating and ensuring service up
 func (s *OrcaStack) Cycle(dsession api.Service, c *OrcaConfig) (string, error) {
-	var status string
-
 	// pull files
 	logPuller.Debug("Cycle step 'pull'")
-	_, err := s.Puller.Pull()
+	_, err := s.puller.Pull()
 	if err != nil {
-		status = "❌ PULL ERROR"
-		return status, nil
+		s.status = "❌ PULL ERROR"
+		return s.status, nil
 	}
 
 	// update compose in object
 	logCompose.Debug("Cycle step 'update_project'")
 	err = s.updateDockerProject(c)
 	if err != nil {
-		status = "❌ COMPOSE ERROR (SYNTAX?)"
-		logCompose.Errorf("Compose Error for %v: %v", s.Servicename, err)
-		return status, nil
+		s.status = "❌ COMPOSE ERROR (SYNTAX?)"
+		logCompose.Errorf("Compose Error for %v: %v", s.servicename, err)
+		return s.status, nil
 	}
 
 	// compose up
@@ -129,18 +129,18 @@ func (s *OrcaStack) Cycle(dsession api.Service, c *OrcaConfig) (string, error) {
 	if c.Autosync == "on" {
 		err = s.ComposeUp(dsession)
 		if err != nil {
-			logCompose.Errorf("Compose Error for %v: %v", s.Servicename, err)
-			status = "❌ START COMPOSE ERROR"
-			return status, nil
+			logCompose.Errorf("Compose Error for %v: %v", s.servicename, err)
+			s.status = "❌ START COMPOSE ERROR"
+			return s.status, nil
 		}
-		status = "\x1b[32m✔\x1b[0m SYNCED"
-		return status, nil
+		s.status = "\x1b[32m✔\x1b[0m SYNCED"
+		return s.status, nil
 	} else {
 		if err == nil {
-			status = "⏸️  AUTOSYNC OFF"
-			return status, nil
+			s.status = "⏸️  AUTOSYNC OFF"
+			return s.status, nil
 		}
 	}
 
-	return status, nil
+	return s.status, nil
 }

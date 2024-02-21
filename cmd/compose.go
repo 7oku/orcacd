@@ -15,9 +15,9 @@ import (
 // generate docker project
 func generateDockerProject(s *OrcaStack, c *OrcaConfig) (*types.Project, error) {
 	configDetails := types.ConfigDetails{
-		WorkingDir: c.Targetpath + "/" + s.Servicename,
+		WorkingDir: c.Targetpath + "/" + s.servicename,
 		ConfigFiles: []types.ConfigFile{
-			{Filename: "docker-compose.yaml", Content: *s.Compose},
+			{Filename: "docker-compose.yaml", Content: *s.compose},
 		},
 		// we can set shell ENV VARS here. theys can be
 		// consumed in docker-compose.yml via ${TESTVAR}
@@ -26,9 +26,9 @@ func generateDockerProject(s *OrcaStack, c *OrcaConfig) (*types.Project, error) 
 		// },
 	}
 
-	projectName := path.Base(s.Servicename)
+	projectName := path.Base(s.servicename)
 
-	p, err := loader.LoadWithContext(*s.Ctx, configDetails, func(options *loader.Options) {
+	p, err := loader.LoadWithContext(*s.ctx, configDetails, func(options *loader.Options) {
 		options.SetProjectName(projectName, true)
 	})
 	if err != nil {

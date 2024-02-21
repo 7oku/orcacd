@@ -24,7 +24,7 @@ services:
       TERM: xterm-256color
       COLORTERM: truecolor
       # example repo
-      OCD_REPOS_EXAMPLE_URL: "https://raw.githubusercontent.com/7oku/sample-compose/main/compose-files/servicename/docker-compose.yaml"
+      OCD_REPOS_EXAMPLE_URL: "https://raw.githubusercontent.com/7oku/orcacd/main/compose-files/servicename/docker-compose.yaml"
       OCD_REPOS_EXAMPLE_USER: "7oku"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -54,7 +54,7 @@ foo@bar:~$ docker compose logs -fn200
     ```yml
     repos:
       githubsuperservice:
-        url: "https://raw.githubusercontent.com/7oku/sample-compose/main/compose-files/servicename/docker-compose.yaml"
+        url: "https://raw.githubusercontent.com/7oku/orcacd/main/compose-files/servicename/docker-compose.yaml"
    basicauth:
      user1: "god"
    loglevel: "error"

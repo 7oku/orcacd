@@ -12,7 +12,7 @@ services:
       TERM: xterm-256color
       COLORTERM: truecolor
       # example repo
-      OCD_REPOS_EXAMPLE_URL: "https://raw.githubusercontent.com/7oku/orcacd/compose-files/servicename/docker-compose.yaml"
+      OCD_REPOS_EXAMPLE_URL: "https://raw.githubusercontent.com/7oku/orcacd/main/compose-files/servicename/docker-compose.yaml"
       OCD_REPOS_EXAMPLE_USER: "7oku"
       OCD_LOGLEVEL: "error"
     volumes:

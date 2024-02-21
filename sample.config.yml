@@ -1,6 +1,6 @@
 repos:
   githubsuperservice:
-      url: "https://raw.githubusercontent.com/7oku/sample-compose/main/compose-files/servicename/docker-compose.yaml"
+      url: "https://raw.githubusercontent.com/7oku/orcacd/main/compose-files/servicename/docker-compose.yaml"
 basicauth:
   ocdadmin: "ocd1337god"
 interval: 300

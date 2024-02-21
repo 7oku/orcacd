@@ -26,31 +26,31 @@ func NewPuller(orcastack *OrcaStack, config *OrcaConfig) *Puller {
 
 // pull
 func (p *Puller) Pull() (bool, error) {
-	logPuller.Debugf("Pulling %v from %v", p.stack.Servicename, p.stack.Repoconfig.Url)
+	logPuller.Debugf("Pulling %v from %v", p.stack.servicename, p.stack.repoconfig.Url)
 	// get file into temporary working dir
 	err := p.Get()
 	if err != nil {
-		logPuller.Errorf("Could not download file from %v: %v", p.stack.Repoconfig.Url, err)
+		logPuller.Errorf("Could not download file from %v: %v", p.stack.repoconfig.Url, err)
 		return false, err
 	}
-	logPuller.Debugf("Downloaded from %v", p.stack.Repoconfig.Url)
+	logPuller.Debugf("Downloaded from %v", p.stack.repoconfig.Url)
 
 	// prepare targetdir
-	err = os.MkdirAll(p.config.Targetpath+"/"+p.stack.Servicename, os.ModePerm)
+	err = os.MkdirAll(p.config.Targetpath+"/"+p.stack.servicename, os.ModePerm)
 	if err != nil {
 		logPuller.Errorf("Could not access target path at %v. Error: %v", p.config.Targetpath, err)
 		return false, err
 	}
 
 	// work on files
-	files, err := os.ReadDir(p.stack.Storepath)
+	files, err := os.ReadDir(p.stack.storepath)
 	if err != nil {
-		logPuller.Errorf("Cannot read workdir %v: %v", p.stack.Storepath, err)
+		logPuller.Errorf("Cannot read workdir %v: %v", p.stack.storepath, err)
 		return false, err
 	}
 	for _, file := range files {
-		sourcefile := p.stack.Storepath + "/" + file.Name()
-		targetfile := p.config.Targetpath + "/" + p.stack.Servicename + "/" + file.Name()
+		sourcefile := p.stack.storepath + "/" + file.Name()
+		targetfile := p.config.Targetpath + "/" + p.stack.servicename + "/" + file.Name()
 		logPuller.Debugf("Working on Source(%v) and Target(%v)", sourcefile, targetfile)
 
 		// update stack object with new compose file
@@ -93,7 +93,7 @@ func (p *Puller) Pull() (bool, error) {
 					}
 				} else {
 					// file is equal, nothing to do
-					logPuller.Infof("[ %v has no changes 👌! ]", p.stack.Servicename)
+					logPuller.Infof("[ %v has no changes 👌! ]", p.stack.servicename)
 					return false, err
 				}
 			}
@@ -108,7 +108,7 @@ func (p *Puller) PopulateCompose(sourcefile string) error {
 	if err != nil {
 		return err
 	}
-	p.stack.Compose = &compose
+	p.stack.compose = &compose
 
 	return nil
 }
@@ -121,7 +121,7 @@ func (p *Puller) Copy(sourcefile string, targetfile string) error {
 	}
 	defer destination.Close()
 
-	err = os.WriteFile(destination.Name(), *p.stack.Compose, 0777)
+	err = os.WriteFile(destination.Name(), *p.stack.compose, 0777)
 	if err != nil {
 		return err
 	}
@@ -131,17 +131,17 @@ func (p *Puller) Copy(sourcefile string, targetfile string) error {
 
 // get file from remote
 func (p *Puller) Get() error {
-	dstFilename := path.Base(p.stack.Repoconfig.Url)
+	dstFilename := path.Base(p.stack.repoconfig.Url)
 
 	// create storepath
-	err := os.MkdirAll(p.stack.Storepath, os.ModePerm)
+	err := os.MkdirAll(p.stack.storepath, os.ModePerm)
 	if err != nil {
 		logPuller.Debug(err)
 		return err
 	}
 
 	// create the request
-	req, err := http.NewRequest("GET", p.stack.Repoconfig.Url, nil)
+	req, err := http.NewRequest("GET", p.stack.repoconfig.Url, nil)
 	if err != nil {
 		logPuller.Debug(err)
 		return err
@@ -149,9 +149,9 @@ func (p *Puller) Get() error {
 
 	// add headers for GitLab and GitHub
 	switch true {
-	case strings.Contains(p.stack.Repoconfig.Url, "/api/v4/projects/"):
-		logPuller.Infof("%v seems to be a Gitlab URL! Applying PRIVATE-TOKEN header ... ", p.stack.Servicename)
-		req.Header.Set("PRIVATE-TOKEN", p.stack.Repoconfig.Secret)
+	case strings.Contains(p.stack.repoconfig.Url, "/api/v4/projects/"):
+		logPuller.Infof("%v seems to be a Gitlab URL! Applying PRIVATE-TOKEN header ... ", p.stack.servicename)
+		req.Header.Set("PRIVATE-TOKEN", p.stack.repoconfig.Secret)
 
 		// GitLab uses strange format for downloading files via api:
 		// i.e. https://somedomain.com/api/v4/projects/<repoid>/repository/files/<folder1>%2F<folderN>%2Fdocker-compose.yaml/raw?ref=main
@@ -159,22 +159,22 @@ func (p *Puller) Get() error {
 		// ... therefore we need to extract file name from the part between the
 		// last occurance of %2F (1) and the /raw part (2)
 		re := regexp.MustCompile(`.*%2F([^%2F]*)\/raw`)
-		dstFilename = re.FindStringSubmatch(p.stack.Repoconfig.Url)[1]
+		dstFilename = re.FindStringSubmatch(p.stack.repoconfig.Url)[1]
 
-	case strings.Contains(p.stack.Repoconfig.Url, "raw.githubusercontent.com"):
-		if p.stack.Repoconfig.Secret != "" {
-			logPuller.Infof("%v seems to be a GitHub URL! Applying TOKEN header ... ", p.stack.Servicename)
-			logPuller.Debugf("Token found: %v", p.stack.Repoconfig.Secret)
-			req.Header.Set("Authorization", "token "+p.stack.Repoconfig.Secret)
+	case strings.Contains(p.stack.repoconfig.Url, "raw.githubusercontent.com"):
+		if p.stack.repoconfig.Secret != "" {
+			logPuller.Infof("%v seems to be a GitHub URL! Applying TOKEN header ... ", p.stack.servicename)
+			logPuller.Debugf("Token found: %v", p.stack.repoconfig.Secret)
+			req.Header.Set("Authorization", "token "+p.stack.repoconfig.Secret)
 		} else {
-			logPuller.Infof("%v seems to be a GitHub URL, but TOKEN was not given. Downloading in plain mode ... ", p.stack.Servicename)
+			logPuller.Infof("%v seems to be a GitHub URL, but TOKEN was not given. Downloading in plain mode ... ", p.stack.servicename)
 		}
 
 	default:
 		// Just a normal URL, so add authentication if provided
-		if p.stack.Repoconfig.User != "" && p.stack.Repoconfig.Secret != "" {
-			logPuller.Info("Applying AUTHORIZATION header for %v ...", p.stack.Servicename)
-			req.SetBasicAuth(p.stack.Repoconfig.User, p.stack.Repoconfig.Secret)
+		if p.stack.repoconfig.User != "" && p.stack.repoconfig.Secret != "" {
+			logPuller.Info("Applying AUTHORIZATION header for %v ...", p.stack.servicename)
+			req.SetBasicAuth(p.stack.repoconfig.User, p.stack.repoconfig.Secret)
 		}
 	}
 
@@ -192,7 +192,7 @@ func (p *Puller) Get() error {
 	}
 
 	// create the file
-	out, err := os.Create(p.stack.Storepath + "/" + dstFilename)
+	out, err := os.Create(p.stack.storepath + "/" + dstFilename)
 	if err != nil {
 		logPuller.Debug(err)
 		return err
